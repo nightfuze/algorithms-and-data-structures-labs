@@ -29,10 +29,6 @@ def replace_digits(number: int) -> str:
         if number % 2 == 0 and (index + 1) % 2 != 0 and not is_replaced:
             digits = digits.replace(digit, digit_word[int(digit)], 1)
             is_replaced = True
-        # Преобразования для нечетных чисел на английскую цифру прописью
-        elif number % 2 != 0:
-            digits = digits.replace(digit, digit_word[int(digit)])
-
     return digits
 
 
