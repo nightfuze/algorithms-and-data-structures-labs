@@ -4,6 +4,7 @@
 # Для упрощения под выводом числа прописью подразумевается последовательный вывод всех цифр числа.
 # Регулярные выражения использовать нельзя.
 # Целые нечетные числа. Замена: первая цифра каждого четного числа на нечетном месте на английскую цифру прописью.
+from typing import List
 
 digit_word = {
     0: "zero",
@@ -35,8 +36,8 @@ def replace_digits(number: int) -> str:
     return digits
 
 
-def extract_integers(word: str) -> list[int]:
-    integers: list[int] = []
+def extract_integers(word: str) -> List[int]:
+    integers: List[int] = []
 
     current_int: int = 0
     is_float: bool = False
@@ -59,19 +60,19 @@ def extract_integers(word: str) -> list[int]:
     return integers
 
 
-def process_file(file_name: str, buffer_size: int) -> list[str]:
+def process_file(file_name: str, buffer_size: int) -> List[str]:
     try:
-        lexemes: list[str] = []
+        lexemes: List[str] = []
 
         with open(file_name, 'r') as file:
             while True:
                 buffer: str = file.read(buffer_size)
                 if not buffer:
                     break
-                char_list: list[str] = buffer.split()
+                char_list: List[str] = buffer.split()
                 # print("initial char_list:", char_list)
                 for char_index, char_item in enumerate(char_list):
-                    numbers: list[int] = extract_integers(char_item)
+                    numbers: List[int] = extract_integers(char_item)
                     # print("numbers:", numbers)
                     for number in numbers:
                         number_in_word: str = replace_digits(number)
