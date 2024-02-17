@@ -68,7 +68,7 @@ def process_file(file_name: str, buffer_size: int) -> List[str]:
                 lexeme_list: List[str] = buffer.split()
                 # print("initial char_list:", char_list)
                 for lexeme_index, lexeme_item in enumerate(lexeme_list):
-                    print(lexeme_item)
+                    # print(lexeme_item)
                     numbers: List[int] = extract_integers(lexeme_item)
                     # print("numbers:", numbers)
                     for number in numbers:
