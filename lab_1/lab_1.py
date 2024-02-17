@@ -20,77 +20,64 @@ digit_word = {
 }
 
 
-def replace_digits(number: int) -> str:
-    digits: str = str(number)
-
-    is_replaced = False
-    for index, digit in enumerate(digits):
-        # Замена первой цифры четного числа на нечетном месте на английскую цифру прописью
-        if number % 2 == 0 and (index + 1) % 2 != 0 and not is_replaced:
-            digits = digits.replace(digit, digit_word[int(digit)], 1)
-            is_replaced = True
-    return digits
+def replace_first_digit(number: int) -> str:
+    first_digit: str = str(abs(number))[0]
+    return str(number).replace(first_digit, digit_word[int(first_digit)], 1)
 
 
 def extract_integers(word: str) -> List[int]:
     integers: List[int] = []
 
-    current_int: int = 0
+    current_number: str = ''
     is_float: bool = False
 
     for char in word:
         if char.isdigit() and not is_float:
-            current_int = current_int * 10 + int(char)
+            current_number += char
         elif char == '.':
-            current_int = 0
+            current_number = ''
             is_float = True
-        elif current_int != 0 and not is_float:
-            integers.append(current_int)
-            current_int = 0
+        elif current_number and not is_float:
+            integers.append(int(current_number))
+            current_number = ''
         elif not char.isdigit() and is_float:
+            current_number = ''
             is_float = False
 
-    if current_int != 0:
-        integers.append(current_int)
+    if current_number:
+        integers.append(int(current_number))
 
     return integers
 
 
 def process_file(file_name: str, buffer_size: int) -> List[str]:
     try:
-        lexemes: List[str] = []
+        result: List[str] = []
 
         with open(file_name, 'r') as file:
             while True:
                 buffer: str = file.read(buffer_size)
                 if not buffer:
                     break
-                lexeme_list: List[str] = buffer.split()
-                # print("initial char_list:", char_list)
-                for lexeme_index, lexeme_item in enumerate(lexeme_list):
-                    # print(lexeme_item)
+                lexemes_list: List[str] = buffer.split()
+                for lexeme_index, lexeme_item in enumerate(lexemes_list):
                     numbers: List[int] = extract_integers(lexeme_item)
-                    # print("numbers:", numbers)
                     for number in numbers:
-                        if number % 2 != 0:
-                            lexeme_list[lexeme_index] = str(number)
+                        if number % 2 == 0:
+                            replaced_number: str = replace_first_digit(number)
+                            result.append(replaced_number)
                         else:
-                            number_in_word: str = replace_digits(number)
-                            lexeme_list[lexeme_index] = lexeme_item.replace(str(number), number_in_word)
-                lexemes.append(" ".join(lexeme_list))
-                # print(" ".join(char_list))
-                # print("final char_list:", char_list)
-
-        return lexemes
+                            result.append(str(number))
+        return result
     except FileNotFoundError:
         print("Файл не найден")
 
 
 def lab_1():
-    buffer_size: int = 4
+    buffer_size: int = 32
     file_name: str = "input.txt"
-    lexemes = process_file(file_name, buffer_size)
-    print(*lexemes)
+    result = process_file(file_name, buffer_size)
+    print(*result)
 
 
 lab_1()
