@@ -65,15 +65,19 @@ def process_file(file_name: str, buffer_size: int) -> List[str]:
                 buffer: str = file.read(buffer_size)
                 if not buffer:
                     break
-                char_list: List[str] = buffer.split()
+                lexeme_list: List[str] = buffer.split()
                 # print("initial char_list:", char_list)
-                for char_index, char_item in enumerate(char_list):
-                    numbers: List[int] = extract_integers(char_item)
+                for lexeme_index, lexeme_item in enumerate(lexeme_list):
+                    print(lexeme_item)
+                    numbers: List[int] = extract_integers(lexeme_item)
                     # print("numbers:", numbers)
                     for number in numbers:
-                        number_in_word: str = replace_digits(number)
-                        char_list[char_index] = char_item.replace(str(number), number_in_word)
-                lexemes.append(" ".join(char_list))
+                        if number % 2 != 0:
+                            lexeme_list[lexeme_index] = str(number)
+                        else:
+                            number_in_word: str = replace_digits(number)
+                            lexeme_list[lexeme_index] = lexeme_item.replace(str(number), number_in_word)
+                lexemes.append(" ".join(lexeme_list))
                 # print(" ".join(char_list))
                 # print("final char_list:", char_list)
 
