@@ -50,17 +50,17 @@ def extract_integers(word: str) -> List[int]:
     return integers
 
 
-def process_file(file_name: str, buffer_size: int) -> List[str]:
+def process_file(file_name: str, buffer_size: int) -> None:
     try:
-        result: List[str] = []
 
         with open(file_name, 'r') as file:
             while True:
+                result: List[str] = []
                 buffer: str = file.read(buffer_size)
                 if not buffer:
                     break
                 lexemes_list: List[str] = buffer.split()
-                for lexeme_index, lexeme_item in enumerate(lexemes_list):
+                for lexeme_item in lexemes_list:
                     numbers: List[int] = extract_integers(lexeme_item)
                     for number in numbers:
                         if number % 2 == 0:
@@ -68,7 +68,7 @@ def process_file(file_name: str, buffer_size: int) -> List[str]:
                             result.append(replaced_number)
                         else:
                             result.append(str(number))
-        return result
+                print(*result)
     except FileNotFoundError:
         print("Файл не найден")
 
@@ -76,8 +76,7 @@ def process_file(file_name: str, buffer_size: int) -> List[str]:
 def lab_1():
     buffer_size: int = 32
     file_name: str = "input.txt"
-    result = process_file(file_name, buffer_size)
-    print(*result)
+    process_file(file_name, buffer_size)
 
 
 lab_1()
