@@ -5,9 +5,9 @@
 # Используя регулярные выражения.
 # Целые нечетные числа. Замена: первая цифра каждого четного числа на нечетном месте на английскую цифру прописью.
 import re
-from typing import List
+from typing import List, Dict
 
-digit_word = {
+digit_word: Dict[int, str] = {
     0: "zero",
     1: "one",
     2: "two",
@@ -27,8 +27,8 @@ def replace_first_digit(number: int) -> str:
 
 
 def extract_integers(text: str) -> List[int]:
-    matched = re.findall(r'-?\d*\.?\d+', text)
-    return [int(x) for x in matched if x.find('.') == -1]
+    matches = re.findall(r"-?(?<![.\d])\d+(?![.\d])", text)
+    return [int(x) for x in matches]
 
 
 def process_file(file_name: str, buffer_size: int) -> None:
