@@ -33,7 +33,7 @@ def replace_first_digit(number: int) -> str:
 
 
 def extract_integers(text: str) -> List[int]:
-    matches: List[str] = re.findall(r"-?(?<![.\d])\d+(?![.\d])", text)
+    matches: List[str] = re.findall(r"-?(?<![,|.\d])\d+(?![,|.\d])", text)
     return list(map(int, matches))
 
 
