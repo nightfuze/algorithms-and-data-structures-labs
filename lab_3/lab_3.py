@@ -17,7 +17,6 @@ B,C,D,E заполняется случайным образом целыми ч
 
 """
 
-
 # from matrix.matrix import Matrix
 import secrets
 from typing import List
@@ -213,9 +212,20 @@ def get_input(text: str) -> int:
             print("Ошибка: Значение должно быть целым. Попробуйте еще раз.")
 
 
+def get_size(text: str) -> int:
+    while True:
+        try:
+            value = get_input(text)
+            if value < 3:
+                raise ValueError
+            return value
+        except ValueError:
+            print("Ошибка: Значение должно быть больше или равно 3. Попробуйте еще раз.")
+
+
 def run():
     k = get_input("K = ")
-    n = get_input("N = ")
+    n = get_size("N = ")
 
     B = Matrix(n, n).fill_random()
     C = Matrix(n, n).fill_random()
