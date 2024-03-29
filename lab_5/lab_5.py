@@ -1,10 +1,14 @@
 import csv
 import time
+from decimal import Decimal
 from typing import List, Callable, Tuple, Union
 
 from matplotlib import pyplot as plt
 
 BenchData = Tuple[str, List[float]]
+
+fact_cache = {0: 1, 1: 1}
+rec_cache = {}
 
 
 def fact_rec(n: int) -> int:
@@ -17,6 +21,22 @@ def fact_rec(n: int) -> int:
     if n < 2:
         return 1
     return n * fact_rec(n - 1)
+
+
+def fact_rec_memo(n: int) -> int:
+    """
+    Возвращает факториал числа n, используя рекурсию с применением кэширования.
+
+    :param n: число
+    """
+
+    if n < 0:
+        raise ValueError("Факториал отрицательного числа не определен")
+
+    if n not in fact_cache:
+        fact_cache[n] = n * fact_rec_memo(n - 1)
+
+    return fact_cache[n]
 
 
 def fact_iter(n: int) -> int:
@@ -41,7 +61,23 @@ def f_rec(n: int) -> Union[float, int]:
 
     if n < 2:
         return 5
-    return (-1) ** n * (f_rec(n - 1) / fact_rec(n) * f_rec(n - 5) / fact_rec(2 * n))
+    return (-1) ** n * (Decimal(f_rec(n - 1)) / Decimal(fact_rec(n)) * Decimal(f_rec(n - 5)) / Decimal(fact_rec(2 * n)))
+
+
+def f_rec_memo(n: int) -> Union[float, int]:
+    """
+    Возвращает значение функции в точке n, используя рекурсию с применением кэширования.
+
+    :param n: точка
+    """
+
+    if n < 2:
+        rec_cache[n] = 5
+
+    if n not in rec_cache:
+        rec_cache[n] = (-1) ** n * (Decimal(f_rec_memo(n - 1)) / Decimal(fact_rec_memo(n)) * Decimal(f_rec_memo(n - 5)) / Decimal(fact_rec_memo(2 * n)))
+
+    return rec_cache[n]
 
 
 def f_iter(n) -> Union[float, int]:
@@ -59,7 +95,7 @@ def f_iter(n) -> Union[float, int]:
     for i in range(2, n + 1):
         last = lst.pop()
         prev = lst[0]
-        lst.insert(0, (-1) ** i * (prev / fact_iter(i)) * last / fact_iter(2 * i))
+        lst.insert(0, (-1) ** i * (Decimal(prev) / Decimal(fact_iter(i))) * Decimal(last) / Decimal(fact_iter(2 * i)))
 
     return lst[0]
 
@@ -154,32 +190,63 @@ def get_input(text: str) -> int:
             print("Ошибка: Значение должно быть целым. Попробуйте еще раз.")
 
 
-def get_valid_input(text: str) -> int:
+def get_valid_input(text: str, min_val: int = 2, max_val: int = 500) -> int:
     """
     Возвращает ввод пользователя, проверяя его на валидность.
 
+    :param min_val: минимальное значение
+    :param max_val: максимальное значение
     :param text: текст запроса
-    
     """
     while True:
         try:
             value = get_input(text)
-            if value > 50 or value < 2:
+            if value > max_val or value < min_val:
                 raise ValueError
             return value
         except ValueError:
-            print("Ошибка: Значение должно быть от 2 до 50. Попробуйте еще раз.")
+            print(f"Ошибка: Значение должно быть от {min_val} до {max_val}. Попробуйте еще раз.")
+
+
+def run_bench(k: int):
+    """
+    Функция для вывода графиков времени выполнения функции и записи результатов в csv файл.
+    Используется рекурсия без оптимизации.
+
+    :param k: размер последовательности натуральных чисел
+    """
+
+    # Так как используется рекурсия без оптимизации, то уменьшаем k до 30, иначе превышает глубину рекурсии
+    if k > 30:
+        k = 30
+
+    natural_numbers = [i for i in range(1, k + 1)]
+    iter_data = get_bench_data(f_iter, natural_numbers)
+    rec_data = get_bench_data(f_rec, natural_numbers)
+    display_plot(iter_data, rec_data, range_lst=natural_numbers)
+    write_csv(iter_data, rec_data, range_lst=natural_numbers, filename="bench")
+
+
+def run_bench_memo(k: int):
+    """
+    Функция для вывода графиков времени выполнения функции и записи результатов в csv файл.
+    Используется рекурсия с оптимизацией.
+
+    :param k: размер последовательности натуральных чисел
+    """
+
+    natural_numbers = [i for i in range(1, k + 1)]
+    rec_data = get_bench_data(f_rec_memo, natural_numbers)
+    iter_data = get_bench_data(f_iter, natural_numbers)
+    display_plot(iter_data, rec_data, range_lst=natural_numbers)
+    write_csv(iter_data, rec_data, range_lst=natural_numbers, filename="bench_memo")
 
 
 def main():
     k = get_valid_input("K = ")
-    natural_numbers = [i for i in range(1, k + 1)]
 
-    iter_data = get_bench_data(f_iter, natural_numbers)
-    rec_data = get_bench_data(f_rec, natural_numbers)
-
-    display_plot(iter_data, rec_data, range_lst=natural_numbers)
-    write_csv(iter_data, rec_data, range_lst=natural_numbers)
+    run_bench(k)
+    run_bench_memo(k)
 
 
 if __name__ == "__main__":
