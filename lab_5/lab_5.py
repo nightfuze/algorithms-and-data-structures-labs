@@ -20,9 +20,12 @@ rec_cache = {}
 def fact_rec(n: int) -> int:
     """
     Возвращает факториал числа n, используя рекурсию.
-
+n
     :param n: число
     """
+
+    if n < 0:
+        raise ValueError("Факториал отрицательного числа не определен")
 
     if n < 2:
         return 1
@@ -53,7 +56,7 @@ def fact_iter(n: int) -> int:
     """
 
     result = 1
-    for i in range(1, n + 1):
+    for i in range(2, n + 1):
         result *= i
     return result
 
@@ -65,9 +68,12 @@ def f_rec(n: int) -> Union[float, int]:
     :param n: точка
     """
 
-    if n < 2:
-        return 5
-    return (-1) ** n * (f_rec(n - 1) / fact_rec(n) * f_rec(n - 5) / fact_rec(2 * n))
+    def wrapper(arg: int) -> Union[float, int]:
+        if arg < 2:
+            return 5
+        return wrapper(arg - 1) / fact_rec(arg) * wrapper(arg - 5) / fact_rec(2 * arg)
+
+    return ((-1) ** n) * wrapper(n)
 
 
 def f_rec_memo(n: int) -> Union[float, int]:
@@ -77,13 +83,16 @@ def f_rec_memo(n: int) -> Union[float, int]:
     :param n: точка
     """
 
-    if n < 2:
-        rec_cache[n] = 5
+    def wrapper(arg: int) -> Union[float, int]:
+        if arg < 2:
+            rec_cache[arg] = 5
 
-    if n not in rec_cache:
-        rec_cache[n] = (-1) ** n * (f_rec_memo(n - 1) / fact_rec_memo(n) * f_rec_memo(n - 5) / fact_rec_memo(2 * n))
+        if arg not in rec_cache:
+            rec_cache[arg] = wrapper(arg - 1) / fact_rec_memo(arg) * wrapper(arg - 5) / fact_rec_memo(2 * arg)
 
-    return rec_cache[n]
+        return rec_cache[arg]
+
+    return ((-1) ** n) * wrapper(n)
 
 
 def f_iter(n) -> Union[float, int]:
@@ -96,14 +105,14 @@ def f_iter(n) -> Union[float, int]:
     if n < 2:
         return 5
 
-    lst = [5] * 5
+    lst: List[Union[float, int]] = [5] * 5
 
     for i in range(2, n + 1):
         last = lst.pop()
         prev = lst[0]
-        lst.insert(0, (-1) ** i * (prev / fact_iter(i)) * last / fact_iter(2 * i))
+        lst.insert(0, (prev / fact_iter(i)) * last / fact_iter(2 * i))
 
-    return lst[0]
+    return ((-1) ** n) * lst[0]
 
 
 def display_plot(*bench_data: BenchData, range_lst: List[int]) -> None:
