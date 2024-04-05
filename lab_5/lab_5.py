@@ -7,6 +7,7 @@
 
 import csv
 import time
+from decimal import Decimal
 from typing import List, Callable, Tuple, Union
 
 from matplotlib import pyplot as plt
@@ -88,7 +89,8 @@ def f_rec_memo(n: int) -> Union[float, int]:
             rec_cache[arg] = 5
 
         if arg not in rec_cache:
-            rec_cache[arg] = wrapper(arg - 1) / fact_rec_memo(arg) * wrapper(arg - 5) / fact_rec_memo(2 * arg)
+            rec_cache[arg] = Decimal(wrapper(arg - 1)) / Decimal(fact_rec_memo(arg)) * Decimal(
+                wrapper(arg - 5)) / Decimal(fact_rec_memo(2 * arg))
 
         return rec_cache[arg]
 
@@ -105,12 +107,12 @@ def f_iter(n) -> Union[float, int]:
     if n < 2:
         return 5
 
-    lst: List[Union[float, int]] = [5] * 5
+    lst: List[Union[float, int, Decimal]] = [5] * 5
 
     for i in range(2, n + 1):
         last = lst.pop()
         prev = lst[0]
-        lst.insert(0, (prev / fact_iter(i)) * last / fact_iter(2 * i))
+        lst.insert(0, (Decimal(prev) / Decimal(fact_iter(i))) * Decimal(last) / Decimal(fact_iter(2 * i)))
 
     return ((-1) ** n) * lst[0]
 
