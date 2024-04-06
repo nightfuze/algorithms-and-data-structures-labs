@@ -86,14 +86,17 @@ def f_rec_memo(n: int, sign: int = -1) -> Union[float, int]:
     :param sign: знак
     """
 
+    cache_key = (n, sign)
+
     if n < 2:
-        return 5
+        rec_cache[cache_key] = 5
+        return rec_cache[cache_key]
 
-    if n not in rec_cache:
-        rec_cache[n] = sign * Decimal(f_rec_memo(n - 1, -sign)) / Decimal(fact_rec_memo(n)) * Decimal(
-            f_rec_memo(n - 5, sign)) / Decimal(fact_rec_memo(2 * n))
+    if cache_key not in rec_cache:
+        rec_cache[cache_key] = sign * (Decimal(f_rec_memo(n - 1, -sign)) / Decimal(fact_rec_memo(n)) * Decimal(
+            f_rec_memo(n - 5, sign)) / Decimal(fact_rec_memo(2 * n)))
 
-    return rec_cache[n]
+    return rec_cache[cache_key]
 
 
 def f_iter(n) -> Union[float, int]:
