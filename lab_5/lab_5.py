@@ -65,39 +65,35 @@ def fact_iter(n: int) -> int:
     return result
 
 
-def f_rec(n: int) -> Union[float, int]:
+def f_rec(n: int, sign: int = -1) -> Union[float, int]:
     """
     Возвращает значение функции в точке n, используя рекурсию.
 
     :param n: точка
+    :param sign: знак
     """
 
-    def wrapper(arg: int) -> Union[float, int]:
-        if arg < 2:
-            return 5
-        return wrapper(arg - 1) / fact_rec(arg) * wrapper(arg - 5) / fact_rec(2 * arg)
-
-    return ((-1) ** n) * wrapper(n)
+    if n < 2:
+        return 5
+    return sign * (f_rec(n - 1, -sign) / fact_rec(n) * f_rec(n - 5, sign) / fact_rec(2 * n))
 
 
-def f_rec_memo(n: int) -> Union[float, int]:
+def f_rec_memo(n: int, sign: int = -1) -> Union[float, int]:
     """
     Возвращает значение функции в точке n, используя рекурсию с применением кэширования.
 
     :param n: точка
+    :param sign: знак
     """
 
-    def wrapper(arg: int) -> Union[float, int]:
-        if arg < 2:
-            rec_cache[arg] = 5
+    if n < 2:
+        return 5
 
-        if arg not in rec_cache:
-            rec_cache[arg] = Decimal(wrapper(arg - 1)) / Decimal(fact_rec_memo(arg)) * Decimal(
-                wrapper(arg - 5)) / Decimal(fact_rec_memo(2 * arg))
+    if n not in rec_cache:
+        rec_cache[n] = sign * Decimal(f_rec_memo(n - 1, -sign)) / Decimal(fact_rec_memo(n)) * Decimal(
+            f_rec_memo(n - 5, sign)) / Decimal(fact_rec_memo(2 * n))
 
-        return rec_cache[arg]
-
-    return ((-1) ** n) * wrapper(n)
+    return rec_cache[n]
 
 
 def f_iter(n) -> Union[float, int]:
@@ -112,12 +108,15 @@ def f_iter(n) -> Union[float, int]:
 
     lst: List[Union[float, int, Decimal]] = [5] * 5
 
+    sign: int = -1
+
     for i in range(2, n + 1):
         last = lst.pop()
         prev = lst[0]
-        lst.insert(0, (Decimal(prev) / Decimal(fact_iter(i))) * Decimal(last) / Decimal(fact_iter(2 * i)))
+        sign *= -1
+        lst.insert(0, sign * (Decimal(prev) / Decimal(fact_iter(i))) * Decimal(last) / Decimal(fact_iter(2 * i)))
 
-    return ((-1) ** n) * lst[0]
+    return lst[0]
 
 
 def display_plot(*bench_data: BenchData, range_lst: List[int]) -> None:
